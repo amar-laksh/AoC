@@ -1,23 +1,28 @@
 module Day1
   ( readCalories,
     countCalories,
-    mostCalories,
     topNTotalCalories,
   )
 where
 
 import Control.Monad (when)
-import Data.List (elemIndex)
+import Data.List (elemIndex, sortBy)
 import Data.Maybe (fromMaybe, listToMaybe)
 
-maximumN :: [Int] -> Int -> [Int]
+type Calories = Int
+
+type CaloriesList = [Int]
+
+type Elf = Int
+
+maximumN :: CaloriesList -> Int -> CaloriesList
 maximumN _ 0 = []
 maximumN elements n = do
   let currentMaximum = maximum elements
   let restOfElements = filter (< currentMaximum) elements
   currentMaximum : maximumN restOfElements (subtract 1 n)
 
-countCalories :: [Int] -> [Int]
+countCalories :: CaloriesList -> CaloriesList
 countCalories [el] = [el]
 countCalories [first, second] = [first + second]
 countCalories caloriesList = do
@@ -26,21 +31,14 @@ countCalories caloriesList = do
   let restOfCaloriesList = drop (length currentCaloriesList + 1) caloriesList
   totalCurrentCalories : countCalories restOfCaloriesList
 
-mostCalories :: [Int] -> (Int, Int)
-mostCalories caloriesList = do
-  let calorieCountList = countCalories caloriesList
-  let maximumCalories = maximum calorieCountList
-  let calories = head [(elf, caloriesCount) | (elf, caloriesCount) <- zip [0 ..] calorieCountList, caloriesCount == maximumCalories]
-  calories
-
-topNTotalCalories :: [Int] -> Int -> Int
+topNTotalCalories :: CaloriesList -> Int -> [(Elf, Calories)]
 topNTotalCalories caloriesList n = do
   let calorieCountList = countCalories caloriesList
   let maximumCaloriesList = maximumN calorieCountList n
-  let calories = [caloriesCount | caloriesCount <- calorieCountList, caloriesCount `elem` maximumCaloriesList]
-  sum calories
+  let calories = [(elf, caloriesCount) | (elf, caloriesCount) <- zip [0 ..] calorieCountList, caloriesCount `elem` maximumCaloriesList]
+  sortBy (\(_, a) (_, b) -> compare b a) calories
 
-readCalories :: String -> IO [Int]
+readCalories :: String -> IO CaloriesList
 readCalories filename = do
   lns <- lines <$> readFile filename
   return (map (\x -> if x == "" then 0 else read x) lns)
