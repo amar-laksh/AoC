@@ -1,10 +1,8 @@
 module Task1
-  ( -- ( helloWorldPure,
-    --   helloWorldMonadic,
-    --   evenWorld,
-    readCalories,
+  ( readCalories,
     countCalories,
     mostCalories,
+    topNTotalCalories,
   )
 where
 
@@ -12,17 +10,15 @@ import Control.Monad (when)
 import Data.List (elemIndex)
 import Data.Maybe (fromMaybe, listToMaybe)
 
--- evenWorld :: Int -> Bool
--- evenWorld = even
---
--- helloWorldMonadic :: String -> IO ()
--- helloWorldMonadic msg = putStrLn ("hello world: " ++ msg)
---
--- helloWorldPure :: String -> String
--- helloWorldPure msg = "hello world: " ++ msg
---
+maximumN :: [Int] -> Int -> [Int]
+maximumN _ 0 = []
+maximumN elements n = do
+  let currentMaximum = maximum elements
+  let restOfElements = filter (< currentMaximum) elements
+  currentMaximum : maximumN restOfElements (subtract 1 n)
 
 countCalories :: [Int] -> [Int]
+countCalories [el] = [el]
 countCalories [first, second] = [first + second]
 countCalories caloriesList = do
   let currentCaloriesList = take (fromMaybe 0 (elemIndex 0 caloriesList)) caloriesList
@@ -36,6 +32,13 @@ mostCalories caloriesList = do
   let maximumCalories = maximum calorieCountList
   let calories = head [(elf, caloriesCount) | (elf, caloriesCount) <- zip [0 ..] calorieCountList, caloriesCount == maximumCalories]
   calories
+
+topNTotalCalories :: [Int] -> Int -> Int
+topNTotalCalories caloriesList n = do
+  let calorieCountList = countCalories caloriesList
+  let maximumCaloriesList = maximumN calorieCountList n
+  let calories = [caloriesCount | caloriesCount <- calorieCountList, caloriesCount `elem` maximumCaloriesList]
+  sum calories
 
 readCalories :: String -> IO [Int]
 readCalories filename = do
