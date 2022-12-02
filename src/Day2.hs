@@ -1,8 +1,8 @@
 module Day2
   ( readStratergy,
-    outcome,
+    applyResponseStratergy,
     handPlayed,
-    newOutcome,
+    applyConditionStratergy,
   )
 where
 
@@ -106,8 +106,8 @@ movePoints move
   | move == Scissors = 3
   | otherwise = 0
 
-outcome :: Round -> Points
-outcome round
+applyResponseStratergy :: Round -> Points
+applyResponseStratergy round
   | resultFromMoves myMove oppMove == Won = totalPoints Won
   | resultFromMoves myMove oppMove == Draw = totalPoints Draw
   | resultFromMoves myMove oppMove == Lost = totalPoints Lost
@@ -117,8 +117,8 @@ outcome round
     myMove = toMove (snd round) Me
     totalPoints result = resultPoints result + movePoints myMove
 
-newOutcome :: Round -> Points
-newOutcome round
+applyConditionStratergy :: Round -> Points
+applyConditionStratergy round
   | moveFromResult result oppMove == Rock = totalPoints Rock
   | moveFromResult result oppMove == Paper = totalPoints Paper
   | moveFromResult result oppMove == Scissors = totalPoints Scissors

@@ -3,8 +3,8 @@ import Control.Exception
 import Control.Monad (when)
 import Data.List
 import Data.Maybe
+import Day1 as D1
 import System.IO.Silently
-import Day1 as T1
 import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -19,7 +19,7 @@ tests = testGroup "Tests" [task1Test]
 task1Test :: TestTree
 task1Test =
   testGroup
-    "*** Task 1 ***"
+    "*** Day 1 ***"
     [ SC.testProperty "Test (Pure)" $
         \(msg :: String) -> T1.helloWorldPure msg == "hello world: " ++ msg,
       SC.testProperty "Test (Monadic)" $

@@ -1,44 +1,22 @@
 module Day1
-  ( readCalories,
-    countCalories,
+  ( readCaloriesList,
     topNTotalCalories,
   )
 where
 
-import Control.Monad (when)
-import Data.List (elemIndex, sortBy)
-import Data.Maybe (fromMaybe, listToMaybe)
+import Common (splitOn)
+import Data.List (sortBy)
 
 type Calories = Int
 
-type CaloriesList = [Int]
-
 type Elf = Int
 
-maximumN :: CaloriesList -> Int -> CaloriesList
-maximumN _ 0 = []
-maximumN elements n = do
-  let currentMaximum = maximum elements
-  let restOfElements = filter (< currentMaximum) elements
-  currentMaximum : maximumN restOfElements (subtract 1 n)
+readCaloriesList :: String -> IO [(Calories, Elf)]
+readCaloriesList filename = do
+  lst <- map (map (\x -> read x :: Int)) . splitOn "" . lines <$> readFile filename
+  return [(elf, sum calories) | (elf, calories) <- zip [0 ..] lst]
 
-countCalories :: CaloriesList -> CaloriesList
-countCalories [el] = [el]
-countCalories [first, second] = [first + second]
-countCalories caloriesList = do
-  let currentCaloriesList = take (fromMaybe 0 (elemIndex 0 caloriesList)) caloriesList
-  let totalCurrentCalories = sum currentCaloriesList
-  let restOfCaloriesList = drop (length currentCaloriesList + 1) caloriesList
-  totalCurrentCalories : countCalories restOfCaloriesList
-
-topNTotalCalories :: CaloriesList -> Int -> [(Elf, Calories)]
+topNTotalCalories :: [(Calories, Elf)] -> Int -> [(Calories, Elf)]
 topNTotalCalories caloriesList n = do
-  let calorieCountList = countCalories caloriesList
-  let maximumCaloriesList = maximumN calorieCountList n
-  let calories = [(elf, caloriesCount) | (elf, caloriesCount) <- zip [0 ..] calorieCountList, caloriesCount `elem` maximumCaloriesList]
-  sortBy (\(_, a) (_, b) -> compare b a) calories
-
-readCalories :: String -> IO CaloriesList
-readCalories filename = do
-  lns <- lines <$> readFile filename
-  return (map (\x -> if x == "" then 0 else read x) lns)
+  let sorted = sortBy (\(_, a) (_, b) -> compare b a) caloriesList
+  take n sorted

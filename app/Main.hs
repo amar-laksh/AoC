@@ -5,13 +5,15 @@ import qualified Day2 as D2
 
 main :: IO ()
 main = do
-  -- Day 1
-  caloriesList <- D1.readCalories "/home/amar/github/challenges/aoc/inputs/input1.txt"
-  stratergy <- D2.readStratergy "/home/amar/github/challenges/aoc/inputs/input2.txt"
-  print (D1.topNTotalCalories caloriesList 1)
-  print (D1.topNTotalCalories caloriesList 3)
-  print (sum (map D2.outcome stratergy) == 11063)
-  print (sum (map D2.newOutcome stratergy) == 10349)
+  print "***Day 1***"
+  caloriesList <- D1.readCaloriesList "./inputs/input1.txt"
+  let mostCalories = head (D1.topNTotalCalories caloriesList 1)
+  let topThreeElfs = map fst (D1.topNTotalCalories caloriesList 3)
+  let topThreeTotalCalories = sum (map snd (D1.topNTotalCalories caloriesList 3))
+  print ("The elf: " ++ show (fst mostCalories) ++ " has the most calories: " ++ show (snd mostCalories))
+  print ("The elfs: " ++ show topThreeElfs ++ " have a combined total of " ++ show topThreeTotalCalories ++ " calories")
 
--- Day 2
--- print (D2.0)
+  print "\n**Day 2***"
+  rounds <- D2.readStratergy "./inputs/input2.txt"
+  print (sum (map D2.applyResponseStratergy rounds) == 11063)
+  print (sum (map D2.applyConditionStratergy rounds) == 10349)
