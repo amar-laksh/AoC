@@ -108,23 +108,25 @@ movePoints move
 
 outcome :: Round -> Points
 outcome round
-  | resultFromMoves myMove oppMove == Won = resultPoints Won + movePoints myMove
-  | resultFromMoves myMove oppMove == Draw = resultPoints Draw + movePoints myMove
-  | resultFromMoves myMove oppMove == Lost = resultPoints Lost + movePoints myMove
+  | resultFromMoves myMove oppMove == Won = totalPoints Won
+  | resultFromMoves myMove oppMove == Draw = totalPoints Draw
+  | resultFromMoves myMove oppMove == Lost = totalPoints Lost
   | otherwise = 0
   where
     oppMove = toMove (fst round) Opponent
     myMove = toMove (snd round) Me
+    totalPoints result = resultPoints result + movePoints myMove
 
 newOutcome :: Round -> Points
 newOutcome round
-  | moveFromResult result oppMove == Rock = movePoints Rock + resultPoints result
-  | moveFromResult result oppMove == Paper = movePoints Paper + resultPoints result
-  | moveFromResult result oppMove == Scissors = movePoints Scissors + resultPoints result
+  | moveFromResult result oppMove == Rock = totalPoints Rock
+  | moveFromResult result oppMove == Paper = totalPoints Paper
+  | moveFromResult result oppMove == Scissors = totalPoints Scissors
   | otherwise = 0
   where
     oppMove = toMove (fst round) Opponent
     result = toResult (snd round)
+    totalPoints move = movePoints move + resultPoints result
 
 readStratergy :: String -> IO Stratergy
 readStratergy filename = do
