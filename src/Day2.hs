@@ -2,16 +2,25 @@ module Day2
   ( readStratergy,
     outcome,
     handPlayed,
+    newOutcome,
   )
 where
 
 data Player = Me | Opponent
 
-data Move = Rock | Paper | Scissors | Invalid deriving (Eq)
+data Move = Rock | Paper | Scissors | Invalid deriving (Eq, Ord)
+
+data Result = Lost | Draw | Won | Undecidable deriving (Eq)
 
 type Symbol = String
 
 type Options = [Symbol]
+
+type Stratergy = [(String, String)]
+
+type Round = (String, String)
+
+type Points = Int
 
 optionsFor :: Player -> Options
 optionsFor Me = do
@@ -43,53 +52,79 @@ handPlayed Opponent symbol
   | scissorsSymbol Opponent == symbol = Scissors
   | otherwise = Invalid
 
-myHand :: Symbol -> Move
-myHand symbol
-  | handPlayed Me symbol == Rock = Rock
-  | handPlayed Me symbol == Paper = Paper
-  | handPlayed Me symbol == Scissors = Scissors
+toMove :: Symbol -> Player -> Move
+toMove symbol player
+  | handPlayed player symbol == Rock = Rock
+  | handPlayed player symbol == Paper = Paper
+  | handPlayed player symbol == Scissors = Scissors
   | otherwise = Invalid
 
-opponentHand :: Symbol -> Move
-opponentHand symbol
-  | handPlayed Opponent symbol == Rock = Rock
-  | handPlayed Opponent symbol == Paper = Paper
-  | handPlayed Opponent symbol == Scissors = Scissors
+toResult :: Symbol -> Result
+toResult symbol
+  | symbol == "X" = Lost
+  | symbol == "Y" = Draw
+  | symbol == "Z" = Won
+  | otherwise = Undecidable
+
+resultFromMoves :: Move -> Move -> Result
+resultFromMoves myMove oppMove
+  | myMove == Rock && oppMove == Paper = Lost
+  | myMove == Rock && oppMove == Rock = Draw
+  | myMove == Rock && oppMove == Scissors = Won
+  | myMove == Paper && oppMove == Paper = Draw
+  | myMove == Paper && oppMove == Rock = Won
+  | myMove == Paper && oppMove == Scissors = Lost
+  | myMove == Scissors && oppMove == Paper = Won
+  | myMove == Scissors && oppMove == Rock = Lost
+  | myMove == Scissors && oppMove == Scissors = Draw
+  | otherwise = Undecidable
+
+moveFromResult :: Result -> Move -> Move
+moveFromResult result oppMove
+  | result == Won && oppMove == Rock = Paper
+  | result == Draw && oppMove == Rock = Rock
+  | result == Lost && oppMove == Rock = Scissors
+  | result == Won && oppMove == Paper = Scissors
+  | result == Draw && oppMove == Paper = Paper
+  | result == Lost && oppMove == Paper = Rock
+  | result == Won && oppMove == Scissors = Rock
+  | result == Draw && oppMove == Scissors = Scissors
+  | result == Lost && oppMove == Scissors = Paper
   | otherwise = Invalid
 
-rockPoints = 1
+resultPoints :: Result -> Points
+resultPoints result
+  | result == Won = 6
+  | result == Draw = 3
+  | result == Lost = 0
+  | otherwise = 0
 
-paperPoints = 2
-
-scissorsPoints = 3
-
-lost = 0
-
-draw = 3
-
-won = 6
-
-type Stratergy = [(String, String)]
-
-type Round = (String, String)
-
-type Points = Int
+movePoints :: Move -> Points
+movePoints move
+  | move == Rock = 1
+  | move == Paper = 2
+  | move == Scissors = 3
+  | otherwise = 0
 
 outcome :: Round -> Points
 outcome round
-  | opponentHand oppPlay == Rock && myHand myPlay == Rock = draw + rockPoints
-  | opponentHand oppPlay == Rock && myHand myPlay == Paper = won + paperPoints
-  | opponentHand oppPlay == Rock && myHand myPlay == Scissors = lost + scissorsPoints
-  | opponentHand oppPlay == Paper && myHand myPlay == Rock = lost + rockPoints
-  | opponentHand oppPlay == Paper && myHand myPlay == Paper = draw + paperPoints
-  | opponentHand oppPlay == Paper && myHand myPlay == Scissors = won + scissorsPoints
-  | opponentHand oppPlay == Scissors && myHand myPlay == Rock = won + rockPoints
-  | opponentHand oppPlay == Scissors && myHand myPlay == Paper = lost + paperPoints
-  | opponentHand oppPlay == Scissors && myHand myPlay == Scissors = draw + scissorsPoints
+  | resultFromMoves myMove oppMove == Won = resultPoints Won + movePoints myMove
+  | resultFromMoves myMove oppMove == Draw = resultPoints Draw + movePoints myMove
+  | resultFromMoves myMove oppMove == Lost = resultPoints Lost + movePoints myMove
   | otherwise = 0
   where
-    myPlay = snd round
-    oppPlay = fst round
+    oppMove = toMove (fst round) Opponent
+    myMove = toMove (snd round) Me
+
+newOutcome :: Round -> Points
+newOutcome round
+  | moveFromResult result oppMove == Rock = movePoints Rock + resultPoints result
+  | moveFromResult result oppMove == Paper = movePoints Paper + resultPoints result
+  | moveFromResult result oppMove == Scissors = movePoints Scissors + resultPoints result
+  | otherwise = 0
+  where
+    oppMove = toMove (fst round) Opponent
+    result = toResult (snd round)
 
 readStratergy :: String -> IO Stratergy
 readStratergy filename = do
