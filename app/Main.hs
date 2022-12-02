@@ -1,6 +1,6 @@
 module Main where
 
-import qualified Task1 as T1
+import qualified Day1 as T1
 
 main :: IO ()
 main = do

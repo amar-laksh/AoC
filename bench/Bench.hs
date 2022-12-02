@@ -1,4 +1,4 @@
-import Task1 as T1
+import Day1 as T1
 import Test.Tasty.Bench
 
 msgs :: [Char]

@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Task1
+      Day1
   other-modules:
       Paths_aoc
   hs-source-dirs:

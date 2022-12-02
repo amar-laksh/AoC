@@ -1,4 +1,4 @@
-module Task1
+module Day1
   ( readCalories,
     countCalories,
     mostCalories,

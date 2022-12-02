@@ -4,7 +4,7 @@ import Control.Monad (when)
 import Data.List
 import Data.Maybe
 import System.IO.Silently
-import Task1 as T1
+import Day1 as T1
 import Test.SmallCheck.Series (NonEmpty (NonEmpty), NonNegative (NonNegative), list)
 import Test.Tasty
 import Test.Tasty.HUnit
