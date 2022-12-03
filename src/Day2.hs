@@ -2,14 +2,17 @@ module Day2
   ( readStratergy,
     winningSchemeFor,
     toSchemeBasedList,
+    toSchemeBasedList2,
     applyStratergy1,
+    applyStratergy2,
     Player (..),
+    day2,
   )
 where
 
 import Common (indexOf)
 
-data Player = Me | Opponent
+data Player = Me | Opponent | Round deriving (Eq)
 
 data Result = Lost | Draw | Won | Undecidable deriving (Eq)
 
@@ -36,10 +39,18 @@ winningSchemeFor Opponent = do
   ["A", "C", "B"]
 winningSchemeFor Me = do
   ["X", "Z", "Y"]
+winningSchemeFor Round = do
+  ["X", "", "", "Y", "", "", "Z"]
 
 toSchemeBasedList :: StratergyList -> [(Int, Int)]
 toSchemeBasedList stratergyList = do
   let myScheme = winningSchemeFor Me
+  let opScheme = winningSchemeFor Opponent
+  [(indexOf os opScheme, indexOf ms myScheme) | (os, ms) <- stratergyList]
+
+toSchemeBasedList2 :: StratergyList -> [(Int, Int)]
+toSchemeBasedList2 stratergyList = do
+  let myScheme = winningSchemeFor Round
   let opScheme = winningSchemeFor Opponent
   [(indexOf os opScheme, indexOf ms myScheme) | (os, ms) <- stratergyList]
 
@@ -55,7 +66,7 @@ totalPoints2 :: Int -> Int -> Int
 totalPoints2 opMove myMove
   | myMove == opMove = movePoints myMove + resultPoints Draw
   | myMove - opMove == 2 = movePoints myMove + resultPoints Won
-  | myMove - opMove == -2 = movePoints myMove + resultPoints Lost
+  | myMove - opMove == -2 = movePoints myMove + resultPoints Draw
   | myMove > opMove = movePoints myMove + resultPoints Lost
   | myMove < opMove = movePoints myMove + resultPoints Won
   | otherwise = 0
@@ -63,8 +74,8 @@ totalPoints2 opMove myMove
 totalPoints :: Int -> Int -> Int
 totalPoints opMove myMove
   | myMove == opMove = movePoints myMove + resultPoints Draw
-  | myMove - opMove == 2 = movePoints myMove + resultPoints Won
-  | myMove - opMove == -2 = movePoints myMove + resultPoints Lost
+  | myMove == 2 && opMove == 0 = movePoints myMove + resultPoints Won
+  | myMove == 0 && opMove == 2 = movePoints myMove + resultPoints Lost
   | myMove > opMove = movePoints myMove + resultPoints Lost
   | myMove < opMove = movePoints myMove + resultPoints Won
   | otherwise = 0
@@ -72,3 +83,10 @@ totalPoints opMove myMove
 readStratergy :: String -> IO StratergyList
 readStratergy filename = do
   map ((\x -> (head x, last x)) . words) . lines <$> readFile filename
+
+day2 = do
+  print "\n**Day 2***"
+  rounds <- readStratergy "./inputs/input2.txt"
+  print (sum (applyStratergy1 (toSchemeBasedList rounds)) == 11063)
+  rounds2 <- readStratergy "./inputs/input2.demo"
+  print (((toSchemeBasedList2 rounds2)))
