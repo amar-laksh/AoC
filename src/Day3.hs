@@ -4,38 +4,34 @@ module Day3
 where
 
 import Common (count, get3rd, indexOf, takeInN)
-import Data.Char (chr, isAsciiLower, ord)
-import Data.List (minimumBy, sortBy)
+import Data.Char (isAsciiLower, ord)
 
-toPriority c = do
-  if isAsciiLower c
-    then ord c - 96
-    else ord c - 38
+toPriority :: Char -> Int
+toPriority c
+  | isAsciiLower c = ord c - 96
+  | otherwise = ord c - 38
 
 readRucksacksInNGroups :: String -> Int -> IO [[String]]
 readRucksacksInNGroups filename n = do
   lns <- lines <$> readFile filename
-  let newLns = concatMap (takeInN n) [lns]
-  return newLns
+  return $ concatMap (takeInN n) [lns]
 
-sumOfItemPriorities :: [[Char]] -> Int
+sumOfItemPriorities :: [[String]] -> Int
 sumOfItemPriorities ruckSacksList = do
-  let midPoint lst = length lst `div` 2
-  let withinBound lb ub p = lb < p && ub > p
-  let commonItems lst = get3rd (head (filter (\(lb, ub, _) -> withinBound lb ub (midPoint lst)) [(indexOf c lst, length lst - indexOf c (reverse lst), c) | (i, c) <- zip [0 ..] lst, count (== c) lst > 1]))
-  sum [toPriority (commonItems lst) | lst <- ruckSacksList]
+  sum [toPriority (uncurry commonBadge (halves lst)) | lst <- map concat ruckSacksList]
+  where
+    halves lst = splitAt (length lst `div` 2) lst
+    commonBadge fh sh = head [char | char <- fh, char `elem` sh]
 
-findCommonBadge :: String -> String -> String -> Char
-findCommonBadge firstRuckSack secondRuckSack thirdRuckSack = do
-  head [char | char <- firstRuckSack, char `elem` secondRuckSack, char `elem` thirdRuckSack]
-
-commonBadgeType :: [[String]] -> Int
-commonBadgeType ruckSacksList = do
-  sum [toPriority (findCommonBadge (head lst) (lst !! 1) (lst !! 2)) | lst <- ruckSacksList]
+sumOfcommonBadge :: [[String]] -> Int
+sumOfcommonBadge ruckSacksList = do
+  sum [toPriority (commonBadge firstL secondL thirdL) | [firstL, secondL, thirdL] <- ruckSacksList]
+  where
+    commonBadge fl sl tl = head [char | char <- fl, char `elem` sl, char `elem` tl]
 
 day3 = do
   print "***Day 3***"
   ruckSacksList <- readRucksacksInNGroups "./inputs/input3.txt" 1
-  print (sumOfItemPriorities (concat ruckSacksList))
+  print (sumOfItemPriorities ruckSacksList)
   ruckSacksList <- readRucksacksInNGroups "./inputs/input3.txt" 3
-  print (commonBadgeType ruckSacksList)
+  print (sumOfcommonBadge ruckSacksList)
