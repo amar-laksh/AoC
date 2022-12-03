@@ -1,3 +1,18 @@
+-- TODO
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+-- THIS IS VERY BAD, GOTTA COMPLETELY REWRITE IT
 module Day2
   ( readStratergy,
     winningSchemeFor,
@@ -89,4 +104,4 @@ day2 = do
   rounds <- readStratergy "./inputs/input2.txt"
   print (sum (applyStratergy1 (toSchemeBasedList rounds)) == 11063)
   rounds2 <- readStratergy "./inputs/input2.demo"
-  print (((toSchemeBasedList2 rounds2)))
+  print (sum (applyStratergy2 (toSchemeBasedList2 rounds2)))
