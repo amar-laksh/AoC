@@ -1,9 +1,11 @@
-module Common (splitOn) where
+module Common (splitOn, indexOf) where
 
 import Data.List (elemIndex)
 import Data.Maybe (fromMaybe)
 
--- This is the helper but I decided to create mine
+indexOf :: Eq a => a -> [a] -> Int
+indexOf delim elements = fromMaybe (length elements) (elemIndex delim elements)
+
 splitOn :: Eq a => a -> [a] -> [[a]]
 splitOn delim [el]
   | delim == el = []
@@ -13,7 +15,7 @@ splitOn delim elements = do
     then [elements]
     else do
       let elementsLength = length elements
-      let delimIndex = fromMaybe elementsLength (elemIndex delim elements)
-      let currentElements = take (if delimIndex == elementsLength then 0 else delimIndex) elements
-      let restOfElements = drop (delimIndex + 1) elements
+      let delimIdx = indexOf delim elements
+      let currentElements = take (if delimIdx == elementsLength then 0 else delimIdx) elements
+      let restOfElements = drop (delimIdx + 1) elements
       currentElements : splitOn delim restOfElements

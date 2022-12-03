@@ -15,5 +15,7 @@ main = do
 
   print "\n**Day 2***"
   rounds <- D2.readStratergy "./inputs/input2.txt"
-  print (sum (map D2.applyResponseStratergy rounds) == 11063)
-  print (sum (map D2.applyConditionStratergy rounds) == 10349)
+  print (sum (D2.applyStratergy1 (D2.toSchemeBasedList rounds)) == 11063)
+
+-- print (sum (map D2.applyResponseStratergy rounds) == 11063)
+-- print (sum (map D2.applyConditionStratergy rounds) == 10349)
