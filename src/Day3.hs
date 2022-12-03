@@ -28,15 +28,16 @@ commonItemType ruckSacksList = do
   let duplicateList lst = get3rd (head (filter (\(lindex, uindex, _) -> lindex < midPoint lst && uindex > midPoint lst) [(indexOf c lst, length lst - indexOf c (reverse lst), c) | (i, c) <- zip [0 ..] lst, count (== c) lst > 1]))
   sum [toAsciiScheme (duplicateList lst) | lst <- ruckSacksList]
 
--- commonBadgeType ruckSacksList = do
+findCommonBadge firstRuckSack secondRuckSck thirdRuckSack = do
+  head [char | char <- firstRuckSack, char `elem` secondRuckSck, char `elem` thirdRuckSack]
+
+commonBadgeType ruckSacksList = do
+  let nthRuckSack lst n = lst !! n
+  sum [toAsciiScheme (findCommonBadge (nthRuckSack lst 0) (nthRuckSack lst 1) (nthRuckSack lst 2)) | lst <- ruckSacksList]
 
 day3 = do
   print "***Day 3***"
   ruckSacksList <- readRucksacksInNGroups "./inputs/input3.demo" 1
   print (commonItemType (concat ruckSacksList))
-  ruckSacksList <- readRucksacksInNGroups "./inputs/input3.demo" 3
-  print ruckSacksList
-
--- print (map concat (concatMap (takeInN 3) [ruckSacksList]))
-
--- print (concatMap (\x -> if indexOf x r `div` 3 == 1 then x else " ") r)
+  ruckSacksList <- readRucksacksInNGroups "./inputs/input3.txt" 3
+  print (commonBadgeType ruckSacksList)
