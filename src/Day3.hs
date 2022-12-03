@@ -3,7 +3,7 @@ module Day3
   )
 where
 
-import Common (count, get3rd, indexOf, takeInN)
+import Common (takeInN)
 import Data.Char (isAsciiLower, ord)
 
 toPriority :: Char -> Int
