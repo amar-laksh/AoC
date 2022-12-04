@@ -18,10 +18,10 @@ readRucksacksInNGroups filename n = do
 
 sumOfItemPriorities :: [[String]] -> Int
 sumOfItemPriorities ruckSacksList = do
-  sum [toPriority (uncurry commonBadge (halves lst)) | lst <- map concat ruckSacksList]
+  sum [toPriority (uncurry commonItem (halves lst)) | lst <- map concat ruckSacksList]
   where
     halves lst = splitAt (length lst `div` 2) lst
-    commonBadge fh sh = head [char | char <- fh, char `elem` sh]
+    commonItem fh sh = head [char | char <- fh, char `elem` sh]
 
 sumOfcommonBadge :: [[String]] -> Int
 sumOfcommonBadge ruckSacksList = do

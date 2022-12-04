@@ -1,4 +1,4 @@
-module Common (splitOn, indexOf, count, get3rd, takeInN) where
+module Common (splitOn, indexOf, count, get3rd, takeInN, subset, intersect) where
 
 import Data.List (elemIndex)
 import Data.Maybe (fromMaybe)
@@ -8,12 +8,17 @@ get3rd (_, _, x) = x
 indexOf :: Eq a => a -> [a] -> Int
 indexOf delim elements = fromMaybe (length elements) (elemIndex delim elements)
 
+subset :: Ord a => [a] -> [a] -> Bool
+subset firstL secondL =
+  all (`elem` secondL) firstL
+
+intersect :: Ord a => [a] -> [a] -> Bool
+intersect firstL secondL =
+  any (`elem` secondL) firstL
+
 count p xs = sum [1 | x <- xs, p x]
 
-splitOn :: Eq a => a -> [a] -> [[a]]
-splitOn delim [el]
-  | delim == el = []
-  | otherwise = [[el]]
+-- splitOn :: Char -> String -> [String]
 splitOn delim elements = do
   if delim `notElem` elements
     then [elements]
