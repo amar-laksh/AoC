@@ -1,9 +1,18 @@
-module Common (splitOn, indexOf, count, get3rd, takeInN, subset, intersect) where
+module Common (splitOn, indexOf, count, get3rd, takeInN, subset, intersect, replace) where
 
 import Data.List (elemIndex)
 import Data.Maybe (fromMaybe)
 
 get3rd (_, _, x) = x
+
+inHead :: String -> String -> Bool
+inHead needle haystack = take (length needle) haystack == needle
+
+replace :: String -> String -> String -> String
+replace needle replacement [] = []
+replace needle replacement haystack
+  | inHead needle haystack = replacement ++ replace needle replacement (drop (length needle) haystack)
+  | not (inHead needle haystack) = head haystack : replace needle replacement (tail haystack)
 
 indexOf :: Eq a => a -> [a] -> Int
 indexOf delim elements = fromMaybe (length elements) (elemIndex delim elements)
