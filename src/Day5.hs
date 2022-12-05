@@ -10,16 +10,17 @@ import Common (indexOf, replace, splitOn)
 readStackAndProcedures filename = do
   lns <- lines <$> readFile filename
   let [stacksLns, procedures] = splitOn "" lns
-  let stackNumbers = words (last stacksLns)
+  let numOfStacks = length (words (last stacksLns))
   let stackSymbolWidth = length (head (words (head stacksLns))) + 1
-  let numOfStacks = length stackNumbers
+  let cleanProcedures = map (map (\x -> read x :: Int) . filter removeWords . words) procedures
   let cleanStacksLns = map (splitOn ' ' . replace (totalSpaces stackSymbolWidth) " ") (init stacksLns)
   let stacks = filter (/= []) [[stack | stackLn <- cleanStacksLns, (index, stack) <- zip [0 ..] stackLn, index == stackN] | stackN <- [0 .. numOfStacks]]
-  return (stacks)
+  return (stacks, cleanProcedures)
   where
     totalSpaces n = take n $ cycle " "
+    removeWords word = word `notElem` ["move", "from", "to"]
 
 day5 = do
   print "***Day 5***"
-  stacks <- readStackAndProcedures "./inputs/input5.txt"
+  stacks <- readStackAndProcedures "./inputs/input5.demo"
   print stacks
