@@ -9,10 +9,12 @@ readDataStream :: String -> IO [String]
 readDataStream filename = lines <$> readFile filename
 
 detectMarker :: Int -> String -> Int
-detectMarker markerWidth dataStream = head [last (map fst tuples) + 1 | tuples <- zipAll markersList, isSet (map snd tuples)]
+detectMarker markerWidth dataStream = head [getLastIndex tuples | tuples <- zipAll chunksList, isSet (getChunk tuples)]
   where
-    markersList = [markerTuple n | n <- [0 .. markerWidth - 1]]
-    markerTuple n = zip [n ..] (drop n dataStream)
+    getLastIndex tuples = last (map fst tuples) + 1
+    getChunk = map snd
+    chunksList = [chunkTuple n | n <- [0 .. markerWidth - 1]]
+    chunkTuple n = zip [n ..] (drop n dataStream)
 
 day6 = do
   print "***Day 6***"
