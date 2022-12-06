@@ -11,15 +11,13 @@ readStackAndProcedures :: String -> IO ([[String]], [[Int]])
 readStackAndProcedures filename = do
   lns <- lines <$> readFile filename
   let [stacksLns, procedures] = splitOn "" lns
-  let numOfStacks = length (words (last stacksLns))
   let stackSymbolWidth = length (head (words (head stacksLns))) + 1
-  let cleanProcedures = map (map (\x -> read x :: Int) . filter removeWords . words) procedures
-  let cleanStacksLns = map (splitOn ' ' . replace (totalSpaces stackSymbolWidth) " ") (init stacksLns)
-  let stacks = filter (/= []) [[stack | stackLn <- cleanStacksLns, (index, stack) <- zip [0 ..] stackLn, index == stackN] | stackN <- [0 .. numOfStacks]]
+  let cleanProcedures = map (map (\x -> read x :: Int) . filter (\x -> x `notElem` ["move", "from", "to"]) . words) procedures
+  let removeDedupSpaces = map (splitOn ' ' . replace (totalSpaces stackSymbolWidth) " ") (init stacksLns)
+  let stacks = filter (/= []) [[stack | stackLn <- removeDedupSpaces, (index, stack) <- zip [0 ..] stackLn, index == stackN] | stackN <- [0 .. length (words (last stacksLns))]]
   return (stacks, cleanProcedures)
   where
     totalSpaces n = take n $ cycle " "
-    removeWords word = word `notElem` ["move", "from", "to"]
 
 emptyPadding padLength = replicate padLength ""
 
