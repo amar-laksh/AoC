@@ -5,6 +5,7 @@ import qualified Day2 as D2
 import qualified Day3 as D3
 import qualified Day4 as D4
 import qualified Day5 as D5
+import qualified Day6 as D6
 
 main :: IO ()
 main = do
@@ -13,3 +14,4 @@ main = do
   D3.day3
   D4.day4
   D5.day5
+  D6.day6

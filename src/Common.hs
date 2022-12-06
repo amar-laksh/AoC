@@ -1,9 +1,19 @@
-module Common (splitOn, indexOf, count, get3rd, takeInN, subset, intersect, replace) where
+module Common (splitOn, indexOf, count, get3rd, takeInN, subset, intersect, replace, isSet, zipAll) where
 
-import Data.List (elemIndex)
+import Data.List (elemIndex, transpose)
 import Data.Maybe (fromMaybe)
 
 get3rd (_, _, x) = x
+
+zipAllWith :: ([a] -> b) -> [[a]] -> [b]
+zipAllWith _ [] = []
+zipAllWith f xss = map f . transpose $ xss
+
+zipAll = zipAllWith id
+
+isSet :: (Eq a) => [a] -> Bool
+isSet [] = True
+isSet (x : xs) = x `notElem` xs && isSet xs
 
 inHead :: String -> String -> Bool
 inHead needle haystack = take (length needle) haystack == needle
