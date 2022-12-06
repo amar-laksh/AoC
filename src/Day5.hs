@@ -21,7 +21,7 @@ readStackAndProcedures filename = do
     totalSpaces n = take n $ cycle " "
     removeWords word = word `notElem` ["move", "from", "to"]
 
-emptyPadding padLength = splitOn ',' (take (padLength - 1) $ cycle ",")
+emptyPadding padLength = replicate padLength ""
 
 addPadding stacks padLength = do
   [addPad stack | stack <- stacks]
@@ -43,13 +43,13 @@ applyProcedure procedure stacks fn = do
   updateStack (cleanStack stacks)
   where
     [totalElementsToRemove, fromStack, toStack] = procedure
-    padLength stack = length (maximumBy (\x y -> compare (length x) (length y)) stack)
-    updateStack stacks = addPadding [fn stack stackIdx elementsToAdd toStack | (stackIdx, stack) <- zip [1 ..] stacks] (padLength stacks)
+    maxStackLength stack = length (maximum stack)
+    updateStack stacks = addPadding [fn stack stackIdx elementsToAdd toStack | (stackIdx, stack) <- zip [1 ..] stacks] (maxStackLength stacks)
     elementsToAdd = concat [take totalElementsToRemove (filter (/= "") stack) | (stackIdx, stack) <- zip [1 ..] stacks, stackIdx == fromStack]
     removeFromStack stack stackIdx
       | stackIdx == fromStack = emptyPadding totalElementsToRemove ++ drop totalElementsToRemove (filter (/= "") stack)
       | otherwise = stack
-    cleanStack stacks = addPadding [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks] (padLength stacks)
+    cleanStack stacks = addPadding [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks] (maxStackLength stacks)
 
 day5 = do
   print "***Day 5***"
