@@ -5,7 +5,7 @@ module Day5
 where
 
 import Common (indexOf, replace, splitOn)
-import Control.Monad
+import Data.List (maximumBy)
 
 readStackAndProcedures :: String -> IO ([[String]], [[Int]])
 readStackAndProcedures filename = do
@@ -21,26 +21,36 @@ readStackAndProcedures filename = do
     totalSpaces n = take n $ cycle " "
     removeWords word = word `notElem` ["move", "from", "to"]
 
-printStack stacks = do
-  sequence_ [putStr (el1 ++ "\t" ++ el2 ++ "\t" ++ el3 ++ "\n") | (el1, el2, el3) <- zip3 (head stacks) (stacks !! 1) (stacks !! 2)]
+emptyPadding padLength = splitOn ',' (take (padLength - 1) $ cycle ",")
+
+addPadding stacks padLength = do
+  [addPad stack | stack <- stacks]
+  where
+    addPad stack
+      | length stack < padLength = emptyPadding (padLength - length stack) ++ stack
+      | otherwise = stack
 
 applyProcedure :: [Int] -> [[String]] -> [[String]]
 applyProcedure procedure stacks = do
-  let cleanStack = [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks]
-  [addToStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] cleanStack]
+  updateStack (cleanStack stacks)
   where
     [totalElementsToRemove, from, to] = procedure
-    elementsToAdd = concat [take totalElementsToRemove stack | (stackIdx, stack) <- zip [1 ..] stacks, stackIdx == from]
+    updateStack stacks = addPadding [addToStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks] (padLength stacks)
+    cleanedStack = cleanStack stacks
+    padLength stack = length (maximumBy (\x y -> compare (length x) (length y)) stack)
+    elementsToAdd = concat [take totalElementsToRemove (filter (/= "") stack) | (stackIdx, stack) <- zip [1 ..] stacks, stackIdx == from]
     removeFromStack stack stackIdx
-      | stackIdx == from = drop totalElementsToRemove stack
+      | stackIdx == from = emptyPadding totalElementsToRemove ++ drop totalElementsToRemove (filter (/= "") stack)
       | otherwise = stack
     addToStack stack stackIdx
       | stackIdx == to = reverse elementsToAdd ++ filter (/= "") stack
       | otherwise = stack
+    cleanStack stacks = addPadding [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks] (padLength stacks)
 
 day5 = do
   print "***Day 5***"
-  (stacks, procedures) <- readStackAndProcedures "./inputs/input5.demo"
-  print (foldr applyProcedure stacks (reverse procedures))
+  (stacks, procedures) <- readStackAndProcedures "./inputs/input5.txt"
+  let lastStack = foldr applyProcedure stacks (reverse procedures)
+  print (filter (\x -> x `notElem` ['[', ']']) (concatMap (head . filter (/= "")) lastStack))
 
 -- print (filter (\x -> x `notElem` ['[', ']']) (concatMap head (foldr applyProcedure stacks (reverse procedures))))
