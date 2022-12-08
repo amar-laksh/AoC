@@ -4,6 +4,7 @@ import qualified Day3 as D3
 import qualified Day4 as D4
 import qualified Day5 as D5
 import qualified Day6 as D6
+import qualified Day7 as D7
 import Test.Tasty.Bench
 
 main :: IO ()
@@ -16,6 +17,11 @@ main =
           bench "day3" $ nfIO D3.day3,
           bench "day4" $ nfIO D4.day4,
           bench "day5" $ nfIO D5.day5,
-          bench "day6" $ nfIO D6.day6
+          bench "day6"
+            $ nfIO
+              D6.day6
+              bench
+              "day7"
+            $ nfIO D6.day7
         ]
     ]
