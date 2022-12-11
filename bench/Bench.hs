@@ -17,11 +17,7 @@ main =
           bench "day3" $ nfIO D3.day3,
           bench "day4" $ nfIO D4.day4,
           bench "day5" $ nfIO D5.day5,
-          bench "day6"
-            $ nfIO
-              D6.day6
-              bench
-              "day7"
-            $ nfIO D6.day7
+          bench "day6" $ nfIO D6.day6,
+          bench "day7" $ nfIO D7.day7
         ]
     ]

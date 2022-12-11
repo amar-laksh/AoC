@@ -1,63 +1,42 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+
 module Day7 (day7) where
 
-import Common (splitOn)
-import GHC.Read (list)
+import Common (count, splitOn)
+import Data.List (intercalate, sort)
 
-readTerminal filename = do
-  readFile filename
+readTerminal = readFile
 
-cmds = ["ls"]
+prefix indents = replicate indents ' '
 
-paramCmds = ["cd"]
+dirFormat d = "- " <> d <> " (dir)\n"
 
-params = ["/", ".."]
+data Stack t = File t Int | Node t [Stack t] deriving (Eq, Ord, Show)
 
-listingTypes = ["dir"]
-
-data Directory = Directory String | Root | BackDirectory | InvalidDirectory deriving (Show, Eq, Ord)
-
-data Commands = ChangeDirectory Directory | ListDirectories | InvalidCommand deriving (Show, Eq, Ord)
-
-data Output = DirectoryType Directory | File String | FileWithSize (String, Int) | DirectoryWithSize (String, Int) | InvalidOutput deriving (Show, Eq, Ord)
-
-data Tree = PNode Output | CNode Output | Tree
-
-getDirectory :: String -> Directory
-getDirectory dir
-  | dir == head params = Root
-  | dir == last params = BackDirectory
-  | otherwise = Directory dir
-
-getListings :: [String] -> [Output]
-getListings lst = do
-  [parseListing l | l <- lst]
+printStack = showTree 0
   where
-    parseListing l
-      | head (words l) == head listingTypes = DirectoryType (getDirectory (last (words l)))
-      | '.' `notElem` last (words l) = DirectoryWithSize (last (words l), read (head (words l)) :: Int)
-      | otherwise = FileWithSize (last (words l), read (head (words l)) :: Int)
+    showTree indents (File n i) = prefix indents <> "- " <> n <> " (file, size=" <> show i <> ")"
+    showTree indents (Node n fs) = prefix indents <> dirFormat n <> "\n" <> unlines [showTree (indents + 1) f | f <- fs]
 
-parseOutput :: [String] -> (Commands, [Output])
-parseOutput [paramCmd]
-  | head (words paramCmd) == head paramCmds = (ChangeDirectory (getDirectory (last (words paramCmd))), [])
-parseOutput output
-  | head output == head cmds = (ListDirectories, getListings (drop 1 output))
-  | otherwise = (InvalidCommand, [InvalidOutput])
+printOutput stack = sequence_ [putStrLn ln | ln <- filter (/= "") (lines (printStack stack))]
 
-parseOutputs :: [[String]] -> [(Commands, [Output])]
-parseOutputs outputs = do
-  [parseOutput output | output <- outputs]
+-- parseLine :: String -> [Stack String]
+-- parseLine line = do
+--   let lns = drop 1 (lines line)
+--   sort [parseLn (words ln) | ln <- lns]
+--   where
+--     parseLn ln
+--       | head ln == "dir" = last ln
+--       | otherwise = File (last ln) (read (head ln) :: Int)
 
-tree :: [(Commands, [Output])] -> [Commands]
-tree lst = do
-  [c | (c, o) <- lst, null o]
+buildTree :: [String] -> [Stack String] -> Stack String
+buildTree [] _ = Node "" []
+buildTree output parentTree = Node "" []
 
 day7 = do
   print "***Day 7***"
   terminalOutput <- readTerminal "./inputs/input7.demo"
   let inputOutputs = filter (/= []) (splitOn '$' terminalOutput)
-  let tlst = map (filter (/= "") . splitOn '\n' . (\x -> if head x == ' ' then drop 1 x else x)) inputOutputs
-  let ast = parseOutputs tlst
-  print (map tree [ast])
-
--- print (map tree (parseOutputs tlst))
+  let tlst = map (\x -> if head x == ' ' then drop 1 x else x) inputOutputs
+  let t = Node "/" [Node "lol" [File "sgas.lol" 12545], File "t.txt" 12, File "tas.txt" 125, Node "emptyDir" [Node "testDir" [File "123.txt" 115152]]]
+  printOutput t
