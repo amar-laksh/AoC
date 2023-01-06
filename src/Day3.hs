@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Day3
   ( day3,
   )
@@ -29,9 +31,10 @@ sumOfcommonBadge ruckSacksList = do
   where
     commonBadge fl sl tl = head [char | char <- fl, char `elem` sl, char `elem` tl]
 
+day3 :: IO ()
 day3 = do
   print "***Day 3***"
-  ruckSacksList <- readRucksacksInNGroups "./inputs/input3.txt" 1
-  print (sumOfItemPriorities ruckSacksList)
-  ruckSacksList <- readRucksacksInNGroups "./inputs/input3.txt" 3
-  print (sumOfcommonBadge ruckSacksList)
+  ruckSacks1 <- readRucksacksInNGroups "./inputs/input3.txt" 1
+  print (sumOfItemPriorities ruckSacks1)
+  ruckSacks2 <- readRucksacksInNGroups "./inputs/input3.txt" 3
+  print (sumOfcommonBadge ruckSacks2)

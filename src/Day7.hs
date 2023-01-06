@@ -1,23 +1,21 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Day7 (day7) where
 
-import Common (count, splitOn)
-import Data.List (intercalate, sort)
+import Common (splitOn)
 
-readTerminal = readFile
-
-prefix indents = replicate indents ' '
-
+dirFormat :: String -> String
 dirFormat d = "- " <> d <> " (dir)\n"
 
 data Stack t = File t Int | Node t [Stack t] deriving (Eq, Ord, Show)
 
+printStack :: Stack String -> String
 printStack = showTree 0
   where
-    showTree indents (File n i) = prefix indents <> "- " <> n <> " (file, size=" <> show i <> ")"
-    showTree indents (Node n fs) = prefix indents <> dirFormat n <> "\n" <> unlines [showTree (indents + 1) f | f <- fs]
+    showTree indents (File n i) = replicate indents ' ' <> "- " <> n <> " (file, size=" <> show i <> ")"
+    showTree indents (Node n fs) = replicate indents ' ' <> dirFormat n <> "\n" <> unlines [showTree (indents + 1) f | f <- fs]
 
+printOutput :: Stack String -> IO ()
 printOutput stack = sequence_ [putStrLn ln | ln <- filter (/= "") (lines (printStack stack))]
 
 -- parseLine :: String -> [Stack String]
@@ -33,9 +31,10 @@ buildTree :: [String] -> [Stack String] -> Stack String
 buildTree [] _ = Node "" []
 buildTree output parentTree = Node "" []
 
+day7 :: IO ()
 day7 = do
   print "***Day 7***"
-  terminalOutput <- readTerminal "./inputs/input7.demo"
+  terminalOutput <- readFile "./inputs/input7.demo"
   let inputOutputs = filter (/= []) (splitOn '$' terminalOutput)
   let tlst = map (\x -> if head x == ' ' then drop 1 x else x) inputOutputs
   let t = Node "/" [Node "lol" [File "sgas.lol" 12545], File "t.txt" 12, File "tas.txt" 125, Node "emptyDir" [Node "testDir" [File "123.txt" 115152]]]

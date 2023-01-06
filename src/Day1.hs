@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Day1
   ( day1,
   )
@@ -17,6 +19,7 @@ topNTotalCalories caloriesList n = do
   where
     sorted = sortBy (\(_, a) (_, b) -> compare b a) caloriesList
 
+day1 :: IO ()
 day1 = do
   print "***Day 1***"
   caloriesList <- readCaloriesList "./inputs/input1.txt"

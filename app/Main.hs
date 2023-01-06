@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Main where
 
 import qualified Day1 as D1

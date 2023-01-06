@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Day5
   ( day5,
     readStackAndProcedures,
@@ -5,7 +7,6 @@ module Day5
 where
 
 import Common (replace, splitOn)
-import Data.List (maximumBy)
 
 readStackAndProcedures :: String -> IO ([[String]], [[Int]])
 readStackAndProcedures filename = do
@@ -19,8 +20,10 @@ readStackAndProcedures filename = do
   where
     totalSpaces n = take n $ cycle " "
 
+emptyPadding :: Int -> [String]
 emptyPadding padLength = replicate padLength ""
 
+addPadding :: [[String]] -> Int -> [[String]]
 addPadding stacks padLength = do
   [addPad stack | stack <- stacks]
   where
@@ -28,10 +31,12 @@ addPadding stacks padLength = do
       | length stack < padLength = emptyPadding (padLength - length stack) ++ stack
       | otherwise = stack
 
+stackAddingCrane :: Eq a => [String] -> a -> [String] -> a -> [String]
 stackAddingCrane stack stackIdx elementsToAdd toStack
   | stackIdx == toStack = reverse elementsToAdd ++ filter (/= "") stack
   | otherwise = stack
 
+stackAddingCrane2 :: Eq a => [String] -> a -> [String] -> a -> [String]
 stackAddingCrane2 stack stackIdx elementsToAdd toStack
   | stackIdx == toStack = elementsToAdd ++ filter (/= "") stack
   | otherwise = stack
@@ -42,13 +47,14 @@ applyProcedure procedure stacks fn = do
   where
     [totalElementsToRemove, fromStack, toStack] = procedure
     maxStackLength stack = length (maximum stack)
-    updateStack stacks = addPadding [fn stack stackIdx elementsToAdd toStack | (stackIdx, stack) <- zip [1 ..] stacks] (maxStackLength stacks)
+    updateStack s = addPadding [fn stack stackIdx elementsToAdd toStack | (stackIdx, stack) <- zip [1 ..] s] (maxStackLength s)
     elementsToAdd = concat [take totalElementsToRemove (filter (/= "") stack) | (stackIdx, stack) <- zip [1 ..] stacks, stackIdx == fromStack]
     removeFromStack stack stackIdx
       | stackIdx == fromStack = emptyPadding totalElementsToRemove ++ drop totalElementsToRemove (filter (/= "") stack)
       | otherwise = stack
-    cleanStack stacks = addPadding [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] stacks] (maxStackLength stacks)
+    cleanStack s = addPadding [removeFromStack stack stackIdx | (stackIdx, stack) <- zip [1 ..] s] (maxStackLength s)
 
+day5 :: IO ()
 day5 = do
   print "***Day 5***"
   (stacks, procedures) <- readStackAndProcedures "./inputs/input5.txt"

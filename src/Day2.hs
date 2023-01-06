@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 -- TODO
 --
 --
@@ -99,6 +101,7 @@ readStratergy :: String -> IO StratergyList
 readStratergy filename = do
   map ((\x -> (head x, last x)) . words) . lines <$> readFile filename
 
+day2 :: IO ()
 day2 = do
   print "\n**Day 2***"
   rounds <- readStratergy "./inputs/input2.txt"

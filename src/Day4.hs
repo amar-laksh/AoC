@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Day4
   ( day4,
   )
@@ -14,6 +16,7 @@ totalPairs :: [[[Int]]] -> ([Int] -> [Int] -> Bool) -> Int
 totalPairs sections fn = do
   count (== True) [fn [head f .. last f] [head s .. last s] | [f, s] <- sections]
 
+day4 :: IO ()
 day4 = do
   print "***Day 4***"
   sections <- readSectionAssignments "./inputs/input4.txt"
